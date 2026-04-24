@@ -74,3 +74,45 @@ const functions = require("firebase-functions");
   
      return null; 
    }); 
+  
+ exports.notificarNovaMensagem = functions 
+   .region("us-east1") 
+   .firestore.document("conversations/{convId}/messages/{msgId}") 
+   .onCreate(async (snap, context) => { 
+     const msg = snap.data(); 
+     const convId = context.params.convId; 
+     const senderId = msg.senderId; 
+  
+     const convDoc = await admin.firestore() 
+       .doc(`conversations/${convId}`).get(); 
+     const participants = convDoc.data()?.participants || []; 
+     const recipientId = participants.find((uid) => uid !== senderId); 
+     if (!recipientId) return null; 
+  
+     const recipientDoc = await admin.firestore() 
+       .doc(`users/${recipientId}`).get(); 
+     const fcmToken = recipientDoc.data()?.fcmToken; 
+     if (!fcmToken) return null; 
+  
+     const senderDoc = await admin.firestore() 
+       .doc(`users/${senderId}`).get(); 
+     const senderName = senderDoc.data()?.displayName || "Alguém"; 
+  
+     const notification = { 
+       title: senderName, 
+       body: msg.type === "audio" ? "🎤 Áudio" : msg.text || "Nova mensagem" 
+     }; 
+  
+     try { 
+       await admin.messaging().send({ 
+         token: fcmToken, 
+         notification, 
+         data: { convId, senderId } 
+       }); 
+       console.log("Notificação enviada para:", recipientId); 
+     } catch (err) { 
+       console.error("Erro ao enviar notificação:", err); 
+     } 
+  
+     return null; 
+   }); 

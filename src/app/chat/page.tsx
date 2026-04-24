@@ -9,13 +9,16 @@ import AuthGuard from "@/components/AuthGuard";
 import { LogOut, MessageSquarePlus, Search as SearchIcon, X } from "lucide-react";
 import { collection, query, where, orderBy, onSnapshot, doc, getDoc } from "firebase/firestore"; 
 import { db } from "@/lib/firebase"; 
+import { usePushNotifications } from "@/hooks/usePushNotifications"; 
 
 export default function ChatPage() {
   const { userData, logout, user } = useAuthContext();
   const [activeConvId, setActiveConvId] = useState<string | null>(null);
   const [isSearching, setIsSearching] = useState(false);
   const [conversations, setConversations] = useState<any[]>([]); 
- 
+  
+  usePushNotifications(user?.uid);
+
   useEffect(() => { 
     console.log("useEffect user:", user?.uid, user?.email); 
     if (!user) return; 
