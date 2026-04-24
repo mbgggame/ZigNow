@@ -30,29 +30,38 @@ export default function AudioRecorder({ convId, senderId }: AudioRecorderProps) 
 
   const handleSend = async () => { 
     if (!audioBlob || isUploading) return; 
-    console.log("handleSend iniciado", { convId, senderId, audioBlob, mimeType }); 
+    console.log("handleSend iniciado", { convId, senderId, size: audioBlob.size, mimeType }); 
   
     setIsUploading(true); 
     try { 
       const timestamp = Date.now(); 
-      const ext = mimeType.includes("mp4") ? "mp4" : mimeType.includes("ogg") ? "ogg" : "webm"; 
+      
+      // Re-read the blob to ensure it's complete 
+      const arrayBuffer = await audioBlob.arrayBuffer(); 
+      const finalBlob = new Blob([arrayBuffer], { type: audioBlob.type }); 
+      console.log("Final blob:", finalBlob.size, finalBlob.type); 
+      
+      const ext = finalBlob.type.includes("mp4") ? "mp4" : 
+                  finalBlob.type.includes("ogg") ? "ogg" : "webm"; 
       const path = `conversations/${convId}/audio/${timestamp}.${ext}`; 
-      console.log("Upload path:", path); 
       
       const storageRef = ref(storage, path); 
-      const metadata = { contentType: mimeType }; 
-      console.log("Iniciando upload..."); 
-      const snapshot = await uploadBytes(storageRef, audioBlob, metadata); 
-      console.log("Upload concluído:", snapshot.ref.fullPath); 
+      const metadata = { 
+        contentType: finalBlob.type, 
+        customMetadata: { duration: String(duration) } 
+      }; 
+      
+      const snapshot = await uploadBytes(storageRef, finalBlob, metadata); 
+      console.log("Upload concluído"); 
       
       const downloadUrl = await getDownloadURL(snapshot.ref); 
-      console.log("Download URL:", downloadUrl); 
+      console.log("URL:", downloadUrl); 
       
       await sendAudioMessage(convId, senderId, downloadUrl, duration); 
-      console.log("Mensagem enviada com sucesso"); 
+      console.log("Mensagem enviada"); 
       cancelRecording(); 
     } catch (err) { 
-      console.error("Erro completo:", err); 
+      console.error("Erro:", err); 
     } finally { 
       setIsUploading(false); 
     } 
