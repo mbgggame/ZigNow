@@ -89,6 +89,12 @@ import { Play, Pause } from "lucide-react";
            <span>{formatTime(duration)}</span> 
          </div> 
        </div> 
+       <audio 
+         src={audioUrl} 
+         controls 
+         style={{ width: "100%", marginTop: 4, height: 28 }} 
+         crossOrigin="anonymous" 
+       /> 
      </div> 
    ); 
  } 
