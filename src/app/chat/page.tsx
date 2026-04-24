@@ -1,17 +1,50 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuthContext } from "@/hooks/useAuthContext";
 import ConversationList from "@/components/ConversationList";
 import ChatArea from "@/components/ChatArea";
 import UserSearch from "@/components/UserSearch";
 import AuthGuard from "@/components/AuthGuard";
 import { LogOut, MessageSquarePlus, Search as SearchIcon, X } from "lucide-react";
+import { collection, query, where, orderBy, onSnapshot, doc, getDoc } from "firebase/firestore"; 
+import { db } from "@/lib/firebase"; 
 
 export default function ChatPage() {
-  const { userData, logout } = useAuthContext();
+  const { userData, logout, user } = useAuthContext();
   const [activeConvId, setActiveConvId] = useState<string | null>(null);
   const [isSearching, setIsSearching] = useState(false);
+  const [conversations, setConversations] = useState<any[]>([]); 
+ 
+  useEffect(() => { 
+    console.log("useEffect user:", user?.uid, user?.email); 
+    if (!user) return; 
+    
+    const q = query( 
+      collection(db, "conversations"), 
+      where("participants", "array-contains", user.uid), 
+      orderBy("lastMessageAt", "desc") 
+    ); 
+ 
+    const unsub = onSnapshot(q, async (snapshot) => { 
+      const convs = await Promise.all( 
+        snapshot.docs.map(async (d) => { 
+          const data = d.data(); 
+          const otherUid = data.participants.find((uid: string) => uid !== user.uid); 
+          if (!otherUid) return null; 
+          const userSnap = await getDoc(doc(db, "users", otherUid)); 
+          return { 
+            id: d.id, 
+            ...data, 
+            otherUser: userSnap.exists() ? userSnap.data() : null 
+          }; 
+        }) 
+      ); 
+      setConversations(convs.filter(Boolean)); 
+    }); 
+ 
+    return () => unsub(); 
+  }, [user]);
 
   return (
     <AuthGuard>
@@ -82,6 +115,7 @@ export default function ChatPage() {
                 
                 <div className="flex-1 overflow-y-auto">
                   <ConversationList 
+                    conversations={conversations} 
                     activeConvId={activeConvId} 
                     onSelectConv={setActiveConvId} 
                   />
