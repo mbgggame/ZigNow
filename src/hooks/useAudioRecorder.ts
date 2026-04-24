@@ -5,18 +5,9 @@
  export type RecorderState = "idle" | "recording" | "recorded"; 
  
  function getSupportedMimeType(): string { 
-   const types = [ 
-     "audio/mp4", 
-     "audio/webm;codecs=opus", 
-     "audio/webm", 
-     "audio/ogg;codecs=opus", 
-     "audio/ogg", 
-   ]; 
-   for (const type of types) { 
-     if (typeof MediaRecorder !== "undefined" && MediaRecorder.isTypeSupported(type)) { 
-       return type; 
-     } 
-   } 
+   if (typeof MediaRecorder === "undefined") return ""; 
+   if (MediaRecorder.isTypeSupported("audio/webm")) return "audio/webm"; 
+   if (MediaRecorder.isTypeSupported("audio/ogg")) return "audio/ogg"; 
    return ""; 
  } 
  
