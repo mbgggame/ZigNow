@@ -28,27 +28,35 @@ export default function AudioRecorder({ convId, senderId }: AudioRecorderProps) 
   const [isPreviewPlaying, setIsPreviewPlaying] = useState(false);
   const audioPreviewRef = useState<HTMLAudioElement | null>(null)[0];
 
-  const handleSend = async () => {
-    if (!audioBlob || isUploading) return;
-
-    setIsUploading(true);
-    try {
-      const timestamp = Date.now();
-      const ext = "wav";
-      const storageRef = ref(storage, `conversations/${convId}/audio/${timestamp}.${ext}`);
+  const handleSend = async () => { 
+    if (!audioBlob || isUploading) return; 
+    console.log("handleSend iniciado", { convId, senderId, audioBlob, mimeType }); 
+  
+    setIsUploading(true); 
+    try { 
+      const timestamp = Date.now(); 
+      const ext = "wav"; 
+      const path = `conversations/${convId}/audio/${timestamp}.${ext}`; 
+      console.log("Upload path:", path); 
       
-      const metadata = { contentType: mimeType || "audio/wav" }; 
-      const snapshot = await uploadBytes(storageRef, audioBlob, metadata);
-      const downloadUrl = await getDownloadURL(snapshot.ref);
+      const storageRef = ref(storage, path); 
+      const metadata = { contentType: "audio/wav" }; 
+      console.log("Iniciando upload..."); 
+      const snapshot = await uploadBytes(storageRef, audioBlob, metadata); 
+      console.log("Upload concluído:", snapshot.ref.fullPath); 
       
-      await sendAudioMessage(convId, senderId, downloadUrl, duration);
-      cancelRecording();
-    } catch (err) {
-      console.error("Error uploading audio:", err);
-    } finally {
-      setIsUploading(false);
-    }
-  };
+      const downloadUrl = await getDownloadURL(snapshot.ref); 
+      console.log("Download URL:", downloadUrl); 
+      
+      await sendAudioMessage(convId, senderId, downloadUrl, duration); 
+      console.log("Mensagem enviada com sucesso"); 
+      cancelRecording(); 
+    } catch (err) { 
+      console.error("Erro completo:", err); 
+    } finally { 
+      setIsUploading(false); 
+    } 
+  }; 
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
