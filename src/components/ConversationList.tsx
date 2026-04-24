@@ -15,7 +15,7 @@
   
    if (!conversations || conversations.length === 0) { 
      return ( 
-       <div style={{ padding: 24, textAlign: "center", color: "#aaa" }}> 
+       <div style={{ padding: 24, textAlign: "center", color: "rgba(255,255,255,0.5)" }}> 
          <p style={{ fontSize: 13 }}>Nenhuma conversa encontrada.</p> 
          <p style={{ fontSize: 12, marginTop: 4, fontStyle: "italic" }}>Busque um @username para começar!</p> 
        </div> 
@@ -23,9 +23,10 @@
    } 
   
    return ( 
-     <div style={{ overflowY: "auto", flex: 1 }}> 
+     <div style={{ overflowY: "auto", flex: 1, background: "transparent" }}> 
        {conversations.map((conv) => { 
          console.log("Renderizando conv:", conv.id, conv.otherUser?.displayName); 
+         const isSelected = convId === conv.id;
          return ( 
            <div 
              key={conv.id} 
@@ -36,25 +37,28 @@
                gap: 12, 
                padding: "12px 16px", 
                cursor: "pointer", 
-               borderBottom: "1px solid #f5f5f5", 
-               background: convId === conv.id ? "#f5f0ff" : "white" 
+               borderBottom: "1px solid #3D0070", 
+               background: isSelected ? "#4A0080" : "transparent",
+               transition: "all 0.2s ease"
              }} 
+             onMouseOver={(e) => !isSelected && (e.currentTarget.style.background = "#3D0070")}
+             onMouseOut={(e) => !isSelected && (e.currentTarget.style.background = "transparent")}
            > 
              <img 
                src={conv.otherUser?.photoURL || "https://www.gravatar.com/avatar?d=mp"} 
-               style={{ width: 40, height: 40, borderRadius: "50%", objectFit: "cover" }} 
+               style={{ width: 40, height: 40, borderRadius: "50%", objectFit: "cover", border: "2px solid #6B00B3" }} 
                alt="" 
              /> 
              <div style={{ flex: 1, minWidth: 0 }}> 
-               <p style={{ fontSize: 13, fontWeight: 600, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}> 
+               <p style={{ fontSize: 14, fontWeight: 600, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", color: "#FFFFFF" }}> 
                  {conv.otherUser?.displayName || conv.id} 
                </p> 
-               <p style={{ fontSize: 12, color: "#888", margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}> 
+               <p style={{ fontSize: 12, color: "rgba(255,255,255,0.65)", margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}> 
                  {conv.lastMessage || "Nova conversa"} 
                </p> 
              </div> 
              {conv.unreadCount?.[conv.otherUser?.uid] > 0 && ( 
-               <div style={{ background: "#7C3AED", color: "white", borderRadius: "50%", width: 20, height: 20, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700 }}> 
+               <div style={{ background: "#9B30FF", color: "white", borderRadius: "50%", width: 20, height: 20, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700 }}> 
                  {conv.unreadCount[conv.otherUser?.uid]} 
                </div> 
              )} 

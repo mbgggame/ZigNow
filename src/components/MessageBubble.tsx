@@ -22,7 +22,7 @@ export default function MessageBubble({ message, isOwn, showDate }: MessageBubbl
     <div className="flex flex-col space-y-2">
       {showDate && date && (
         <div className="flex justify-center my-4">
-          <span className="bg-white px-3 py-1 rounded-full text-[10px] font-bold text-gray-400 shadow-sm border border-gray-100 uppercase tracking-wider">
+          <span className="bg-[#4A0080] px-4 py-1 rounded-full text-[11px] font-bold text-white shadow-md uppercase tracking-wider">
             {formatDateLabel(date)}
           </span>
         </div>
@@ -30,16 +30,16 @@ export default function MessageBubble({ message, isOwn, showDate }: MessageBubbl
       
       <div className={`flex ${isOwn ? "justify-end" : "justify-start"}`}>
         <div
-          className={`max-w-[70%] px-4 py-2.5 rounded-2xl shadow-sm text-sm ${
+          className={`max-w-[75%] px-4 py-2.5 shadow-sm text-sm transition-all duration-200 ${
             isOwn
-              ? "bg-[#7C3AED] text-white rounded-tr-none"
-              : "bg-white text-gray-900 rounded-tl-none border border-gray-100"
+              ? "bg-[#6B00B3] text-white rounded-[18px_18px_4px_18px]"
+              : "bg-white text-[#1a1a1a] rounded-[18px_18px_18px_4px] shadow-[0_2px_8px_rgba(0,0,0,0.05)]"
           }`}
         >
           <p className="whitespace-pre-wrap break-words">{message.text}</p>
           <div
-            className={`text-[10px] mt-1 flex justify-end ${
-              isOwn ? "text-purple-100" : "text-gray-400"
+            className={`text-[10px] mt-1 flex justify-end font-medium ${
+              isOwn ? "text-white/70" : "text-[#999]"
             }`}
           >
             {date ? format(date, "HH:mm") : "--:--"}

@@ -77,7 +77,7 @@ export default function AudioRecorder({ convId, senderId }: AudioRecorderProps) 
     return (
       <button
         onClick={startRecording}
-        className="p-2.5 rounded-2xl text-gray-400 hover:bg-gray-50 hover:text-[#7C3AED] transition-all"
+        className="p-3.5 rounded-full text-white bg-[#6B00B3] hover:bg-[#4A0080] transition-all shadow-lg active:scale-95"
         title="Gravar áudio"
       >
         <Mic size={22} />
@@ -86,12 +86,12 @@ export default function AudioRecorder({ convId, senderId }: AudioRecorderProps) 
   }
 
   return (
-    <div className="flex items-center gap-2 bg-purple-50 p-1.5 rounded-2xl border border-purple-100 animate-in fade-in zoom-in duration-200">
+    <div className="flex items-center gap-2 bg-white p-1.5 rounded-full border-2 border-[#6B00B3] shadow-xl animate-in fade-in zoom-in duration-200">
       {state === "recording" ? (
         <>
           <div className="flex items-center gap-2 px-3 py-1">
-            <div className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
-            <span className="text-sm font-mono font-bold text-gray-700">{formatTime(duration)}</span>
+            <div className="h-2.5 w-2.5 rounded-full bg-red-500 animate-pulse" />
+            <span className="text-sm font-mono font-bold text-[#4A0080]">{formatTime(duration)}</span>
           </div>
           <button
             onClick={cancelRecording}
@@ -102,7 +102,7 @@ export default function AudioRecorder({ convId, senderId }: AudioRecorderProps) 
           </button>
           <button
             onClick={stopRecording}
-            className="p-2 bg-red-500 text-white rounded-xl hover:bg-red-600 transition-all shadow-sm"
+            className="p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-all shadow-sm"
             title="Parar"
           >
             <Square size={18} fill="currentColor" />
@@ -110,8 +110,8 @@ export default function AudioRecorder({ convId, senderId }: AudioRecorderProps) 
         </>
       ) : (
         <>
-          <div className="flex items-center gap-2 px-2">
-            <span className="text-xs font-bold text-purple-600">{formatTime(duration)}</span>
+          <div className="flex items-center gap-2 px-3">
+            <span className="text-xs font-extrabold text-[#6B00B3]">{formatTime(duration)}</span>
           </div>
           <button
             onClick={cancelRecording}
@@ -123,7 +123,7 @@ export default function AudioRecorder({ convId, senderId }: AudioRecorderProps) 
           <button
             onClick={handleSend}
             disabled={isUploading}
-            className="p-2 bg-[#7C3AED] text-white rounded-xl hover:bg-[#6D28D9] transition-all shadow-md shadow-purple-100 disabled:opacity-50"
+            className="p-2 bg-[#6B00B3] text-white rounded-full hover:bg-[#4A0080] transition-all shadow-md disabled:opacity-50"
             title="Enviar áudio"
           >
             {isUploading ? (

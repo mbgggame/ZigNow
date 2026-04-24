@@ -48,16 +48,27 @@ export default function UserSearch({ onClose, onSelectConv }: Props) {
   }, [query]); 
  
   return ( 
-    <div style={{ padding: "12px", borderBottom: "1px solid #f0f0f0" }}> 
+    <div style={{ padding: "12px", borderBottom: "1px solid #3D0070", background: "#2D0050" }}> 
       <input 
         type="text" 
         placeholder="Buscar @username..." 
         value={query} 
         onChange={e => setQuery(e.target.value)} 
-        style={{ width: "100%", padding: "8px 12px", borderRadius: 8, border: "1px solid #ddd", fontSize: 13, outline: "none", boxSizing: "border-box" }} 
+        className="placeholder:text-white/50"
+        style={{  
+          width: "100%",  
+          padding: "10px 12px",  
+          borderRadius: 12,  
+          border: "2px solid #6B00B3",  
+          fontSize: 13,  
+          outline: "none",  
+          boxSizing: "border-box", 
+          background: "#3D0070", 
+          color: "white" 
+        }} 
       /> 
-      {searching && <p style={{ fontSize: 12, color: "#aaa", marginTop: 8 }}>Buscando...</p>} 
-      {notFound && !searching && <p style={{ fontSize: 12, color: "#aaa", marginTop: 8 }}>Usuário não encontrado</p>} 
+      {searching && <p style={{ fontSize: 12, color: "rgba(255,255,255,0.5)", marginTop: 8 }}>Buscando...</p>} 
+      {notFound && !searching && <p style={{ fontSize: 12, color: "rgba(255,255,255,0.5)", marginTop: 8 }}>Usuário não encontrado</p>} 
       {result && !searching && ( 
         <div 
           onClick={async () => { 
@@ -68,14 +79,34 @@ export default function UserSearch({ onClose, onSelectConv }: Props) {
             setResult(null); 
             onClose(); 
           }} 
-          style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 10, padding: "8px", borderRadius: 8, cursor: "pointer", background: "#f9f5ff" }} 
+          style={{  
+            display: "flex",  
+            alignItems: "center",  
+            gap: 10,  
+            marginTop: 10,  
+            padding: "10px",  
+            borderRadius: 12,  
+            cursor: "pointer",  
+            background: "#3D0070", 
+            transition: "all 0.2s ease" 
+          }} 
+          onMouseOver={(e) => e.currentTarget.style.background = "#4A0080"} 
+          onMouseOut={(e) => e.currentTarget.style.background = "#3D0070"} 
         > 
-          <img src={result.photoURL || "https://www.gravatar.com/avatar?d=mp"} style={{ width: 36, height: 36, borderRadius: "50%" }} alt="" /> 
-          <div> 
-            <p style={{ fontSize: 13, fontWeight: 600, margin: 0 }}>{result.displayName}</p> 
-            <p style={{ fontSize: 12, color: "#888", margin: 0 }}>@{result.username}</p> 
+          <img src={result.photoURL || "https://www.gravatar.com/avatar?d=mp"} style={{ width: 40, height: 40, borderRadius: "50%", border: "2px solid #6B00B3" }} alt="" /> 
+          <div style={{ flex: 1, minWidth: 0 }}> 
+            <p style={{ fontSize: 14, fontWeight: 600, margin: 0, color: "white" }}>{result.displayName}</p> 
+            <p style={{ fontSize: 12, color: "rgba(255,255,255,0.7)", margin: 0 }}>@{result.username}</p> 
           </div> 
-          <span style={{ marginLeft: "auto", fontSize: 12, color: "#7C3AED", fontWeight: 600 }}>Conversar</span> 
+          <span style={{  
+            marginLeft: "auto",  
+            fontSize: 12,  
+            color: "#9B30FF",  
+            fontWeight: 700, 
+            background: "white", 
+            padding: "4px 8px", 
+            borderRadius: "8px" 
+          }}>Conversar</span> 
         </div> 
       )} 
     </div> 

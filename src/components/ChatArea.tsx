@@ -18,8 +18,8 @@ import AudioRecorder from "./AudioRecorder";
 import CallButton from "./CallButton";
 import CallOverlay from "./CallOverlay";
 import { useCall } from "@/hooks/useCall";
-import { Send, MessageCircle, Loader2 } from "lucide-react";
-import { isSameDay, format } from "date-fns";
+import { Send, MessageCircle, Loader2, X } from "lucide-react";
+import { isSameDay, format, isToday, isYesterday } from "date-fns";
 
 interface ChatAreaProps {
   convId: string | null;
@@ -109,15 +109,21 @@ export default function ChatArea({ convId }: ChatAreaProps) {
     }
   };
 
+  const formatDateLabel = (d: Date) => {
+    if (isToday(d)) return "Hoje";
+    if (isYesterday(d)) return "Ontem";
+    return format(d, "dd/MM/yyyy");
+  };
+
   if (!convId) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center bg-[#F9FAFB] p-8">
-        <div className="bg-white p-12 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center text-center space-y-4">
-          <div className="bg-purple-50 p-6 rounded-full">
-            <MessageCircle size={64} className="text-[#7C3AED]" />
+      <div className="flex-1 flex flex-col items-center justify-center bg-[#F0E6FF] p-8">
+        <div className="bg-white p-12 rounded-3xl shadow-xl flex flex-col items-center text-center space-y-4 max-w-sm">
+          <div className="bg-[#F0E6FF] p-6 rounded-full">
+            <MessageCircle size={64} className="text-[#4A0080]" />
           </div>
-          <h2 className="text-2xl font-bold text-gray-900">Seu espaço de conversa</h2>
-          <p className="text-gray-500 max-w-xs">
+          <h2 className="text-2xl font-extrabold text-[#4A0080]">Seu espaço de conversa</h2>
+          <p className="text-[#6B00B3] font-medium">
             Selecione uma conversa ou busque um @username para começar a falar em paz.
           </p>
         </div>
@@ -126,24 +132,26 @@ export default function ChatArea({ convId }: ChatAreaProps) {
   }
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-[#F3F4F6] relative">
+    <div className="flex-1 flex flex-col h-full bg-[#F0E6FF] relative">
       {/* Header */}
-      <div className="h-16 bg-white border-b border-gray-100 px-6 flex items-center gap-4 z-10 shrink-0">
+      <div className="h-16 bg-[#4A0080] px-6 flex items-center gap-4 z-10 shrink-0 shadow-md">
         <img
           src={otherUser?.photoURL || "https://www.gravatar.com/avatar?d=mp"}
           alt={otherUser?.displayName}
-          className="h-10 w-10 rounded-full object-cover border border-gray-100"
+          className="h-10 w-10 rounded-full object-cover border-2 border-[#6B00B3]"
         />
         <div className="min-w-0 flex-1">
-          <h3 className="font-bold text-gray-900 truncate leading-tight">
+          <h3 className="font-bold text-white truncate leading-tight">
             {otherUser?.displayName || "Carregando..."}
           </h3>
-          <p className="text-xs text-gray-500 font-medium">@{otherUser?.username}</p>
+          <p className="text-xs text-white/70 font-medium">@{otherUser?.username}</p>
         </div>
-        <CallButton 
-          onClick={startCall} 
-          disabled={callState !== "idle"} 
-        />
+        <div className="flex items-center gap-2">
+          <CallButton 
+            onClick={startCall} 
+            disabled={callState !== "idle"} 
+          />
+        </div>
       </div>
 
       {/* Messages Area */}
@@ -161,8 +169,8 @@ export default function ChatArea({ convId }: ChatAreaProps) {
               <div key={msg.id} className={`flex flex-col space-y-2 ${msg.senderId === user?.uid ? "items-end" : "items-start"}`}>
                 {showDate && msg.createdAt && (
                   <div className="flex justify-center w-full my-4">
-                    <span className="bg-white px-3 py-1 rounded-full text-[10px] font-bold text-gray-400 shadow-sm border border-gray-100 uppercase tracking-wider">
-                      {isSameDay(msg.createdAt.toDate(), new Date()) ? "Hoje" : isSameDay(msg.createdAt.toDate(), new Date(Date.now() - 86400000)) ? "Ontem" : format(msg.createdAt.toDate(), "dd/MM/yyyy")}
+                    <span className="bg-[#4A0080] px-4 py-1 rounded-full text-[11px] font-bold text-white shadow-md uppercase tracking-wider">
+                      {formatDateLabel(msg.createdAt.toDate())}
                     </span>
                   </div>
                 )}
@@ -196,14 +204,14 @@ export default function ChatArea({ convId }: ChatAreaProps) {
       />
 
       {/* Input Area */}
-      <div className="p-4 bg-white border-t border-gray-100 z-10">
+      <div className="p-4 bg-transparent z-10">
         <div className="max-w-4xl mx-auto flex items-end gap-3">
           {convId && <AudioRecorder convId={convId} senderId={user?.uid || ""} />} 
           <form onSubmit={handleSendMessage} className="flex-1 flex items-end gap-3">
-            <div className="flex-1 bg-gray-50 rounded-2xl border border-gray-100 px-4 py-2.5 focus-within:bg-white focus-within:border-[#7C3AED] focus-within:ring-1 focus-within:ring-[#7C3AED] transition-all">
+            <div className="flex-1 bg-white rounded-[24px] shadow-lg px-4 py-2.5 transition-all">
             <textarea
               placeholder="Digite uma mensagem..."
-              className="w-full bg-transparent resize-none max-h-32 focus:outline-none text-sm py-1"
+              className="w-full bg-transparent resize-none max-h-32 focus:outline-none text-[#1a1a1a] text-sm py-1"
               rows={1}
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
@@ -218,12 +226,12 @@ export default function ChatArea({ convId }: ChatAreaProps) {
           <button
             type="submit"
             disabled={!inputText.trim() || loading}
-            className="bg-[#7C3AED] text-white p-3 rounded-2xl hover:bg-[#6D28D9] active:scale-95 transition-all shadow-md shadow-purple-100 disabled:opacity-50 disabled:scale-100"
+            className="bg-[#6B00B3] text-white p-3.5 rounded-full hover:bg-[#4A0080] active:scale-95 transition-all shadow-xl disabled:opacity-50 disabled:scale-100"
           >
             {loading ? (
               <Loader2 className="h-5 w-5 animate-spin" />
             ) : (
-              <Send size={20} />
+              <Send size={22} />
             )}
           </button>
         </form>

@@ -58,40 +58,40 @@ export default function ChatPage() {
 
   return (
     <AuthGuard>
-      <div className="flex h-screen w-screen bg-gray-50 overflow-hidden font-sans text-gray-900">
+      <div className="flex h-screen w-screen bg-[#F0E6FF] overflow-hidden font-sans text-gray-900">
         {/* Sidebar */}
         <div 
-          className={`flex flex-col border-r border-gray-100 bg-white transition-all duration-300 ease-in-out ${
+          className={`flex flex-col border-r border-[#3D0070] bg-[#2D0050] transition-all duration-300 ease-in-out ${
             activeConvId ? "hidden md:flex md:w-80 lg:w-96" : "w-full md:w-80 lg:w-96"
           }`}
         >
           {/* Sidebar Header */}
-          <div className="h-16 flex items-center justify-between px-4 border-b border-gray-50 shrink-0 bg-white">
+          <div className="h-16 flex items-center justify-between px-4 border-b border-[#3D0070] shrink-0 bg-[#2D0050]">
             <div className="flex items-center gap-3">
               <div className="relative">
                 <img
                   src={userData?.photoURL || "https://www.gravatar.com/avatar?d=mp"}
                   alt="Profile"
-                  className="h-10 w-10 rounded-full object-cover border-2 border-purple-50"
+                  className="h-10 w-10 rounded-full object-cover border-2 border-[#6B00B3]"
                 />
-                <div className="absolute bottom-0 right-0 h-3 w-3 bg-green-500 border-2 border-white rounded-full"></div>
+                <div className="absolute bottom-0 right-0 h-3 w-3 bg-green-500 border-2 border-[#2D0050] rounded-full"></div>
               </div>
               <div className="min-w-0">
-                <p className="text-sm font-bold truncate">@{userData?.username || "usuario"}</p>
-                <p className="text-[10px] text-green-600 font-bold uppercase tracking-wider">Online</p>
+                <p className="text-sm font-bold truncate text-white">@{userData?.username || "usuario"}</p>
+                <p className="text-[10px] text-white/70 truncate">{userData?.displayName || ""}</p>
               </div>
             </div>
             <div className="flex items-center gap-1">
               <button 
                 onClick={() => setIsSearching(!isSearching)}
-                className={`p-2 rounded-xl transition-all ${isSearching ? 'bg-purple-50 text-[#7C3AED]' : 'text-gray-400 hover:bg-gray-50 hover:text-gray-600'}`}
+                className={`p-2 rounded-xl transition-all ${isSearching ? 'bg-[#3D0070] text-white' : 'text-white hover:bg-[#3D0070]'}`}
                 title="Nova conversa"
               >
                 <MessageSquarePlus size={22} />
               </button>
               <button 
                 onClick={() => logout()}
-                className="p-2 rounded-xl text-gray-400 hover:bg-red-50 hover:text-red-500 transition-all"
+                className="p-2 rounded-xl text-white hover:bg-[#3D0070] transition-all"
                 title="Sair"
               >
                 <LogOut size={22} />
@@ -114,11 +114,11 @@ export default function ChatPage() {
                 {/* Search Conversations Placeholder */}
                 <div className="px-4 py-3 shrink-0">
                   <div className="relative group">
-                    <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#7C3AED] transition-colors" size={18} />
+                    <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-white/70 group-focus-within:text-white transition-colors" size={18} />
                     <input
                       type="text"
                       placeholder="Pesquisar conversas..."
-                      className="w-full bg-gray-50 rounded-xl py-2 pl-10 pr-4 text-sm focus:outline-none focus:ring-1 focus:ring-[#7C3AED] focus:bg-white transition-all"
+                      className="w-full bg-[#3D0070] text-white placeholder:text-white/70 rounded-xl py-2 pl-10 pr-4 text-sm focus:outline-none focus:ring-1 focus:ring-[#9B30FF] transition-all"
                     />
                   </div>
                 </div>
@@ -137,7 +137,7 @@ export default function ChatPage() {
 
         {/* Chat Area */}
         <div 
-          className={`flex-1 flex flex-col bg-white transition-all duration-300 ease-in-out ${
+          className={`flex-1 flex flex-col bg-[#F0E6FF] transition-all duration-300 ease-in-out ${
             !activeConvId ? "hidden md:flex" : "flex"
           }`}
         >

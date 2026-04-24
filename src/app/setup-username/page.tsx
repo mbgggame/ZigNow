@@ -119,29 +119,29 @@ export default function SetupUsernamePage() {
   if (authLoading || !user) return null;
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#F9FAFB] p-4">
-      <div className="w-full max-w-md space-y-6 rounded-2xl bg-white p-8 shadow-sm border border-gray-100">
+    <div className="flex min-h-screen items-center justify-center bg-[#2D0050] p-4">
+      <div className="w-full max-w-md space-y-6 rounded-2xl bg-white p-8 shadow-xl">
         <div className="text-center space-y-2">
-          <h1 className="text-2xl font-bold text-gray-900">Escolha seu @username</h1>
-          <p className="text-gray-500 text-sm">
+          <h1 className="text-2xl font-bold text-[#4A0080]">Escolha seu @username</h1>
+          <p className="text-[#6B00B3] text-sm">
             Ele será sua identidade no Zighub. Não pode ser alterado depois.
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="relative">
-            <div className="flex items-center rounded-xl border border-gray-200 bg-gray-50 px-4 focus-within:bg-white focus-within:border-[#7C3AED] focus-within:ring-1 focus-within:ring-[#7C3AED] transition-all">
-              <span className="text-gray-400 font-medium text-lg">@</span>
+            <div className="flex items-center rounded-2xl border-2 border-[#9B30FF] bg-white px-4 focus-within:border-[#4A0080] transition-all">
+              <span className="text-[#6B00B3] font-medium text-lg">@</span>
               <input
                 type="text"
                 placeholder="seu_username"
-                className="w-full bg-transparent p-4 text-lg font-medium focus:outline-none"
+                className="w-full bg-transparent p-4 text-lg font-medium focus:outline-none text-[#1a1a1a]"
                 value={username}
                 onChange={handleUsernameChange}
                 required
               />
               <div className="flex items-center">
-                {status === 'checking' && <Loader2 className="h-5 w-5 animate-spin text-[#7C3AED]" />}
+                {status === 'checking' && <Loader2 className="h-5 w-5 animate-spin text-[#4A0080]" />}
                 {status === 'available' && <CheckCircle2 className="h-5 w-5 text-green-500" />}
                 {(status === 'unavailable' || status === 'invalid') && <XCircle className="h-5 w-5 text-red-500" />}
               </div>
@@ -160,7 +160,7 @@ export default function SetupUsernamePage() {
           <button
             type="submit"
             disabled={status !== 'available' || isSubmitting}
-            className="flex w-full items-center justify-center rounded-xl bg-[#7C3AED] p-4 font-semibold text-white shadow-md shadow-purple-100 transition-all hover:bg-[#6D28D9] active:scale-[0.98] disabled:opacity-50 disabled:bg-gray-300 disabled:shadow-none"
+            className="flex w-full items-center justify-center rounded-2xl bg-[#4A0080] p-4 font-bold text-white shadow-lg transition-all hover:bg-[#6B00B3] active:scale-[0.98] disabled:opacity-50 disabled:bg-gray-300 disabled:shadow-none"
           >
             {isSubmitting ? <Loader2 className="h-5 w-5 animate-spin" /> : "Confirmar"}
           </button>

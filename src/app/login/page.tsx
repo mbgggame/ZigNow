@@ -58,12 +58,30 @@ export default function LoginPage() {
   } 
  
   return ( 
-    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#f0f2f5" }}> 
-      <div style={{ background: "white", borderRadius: 16, padding: 40, width: 360, boxShadow: "0 2px 16px rgba(0,0,0,0.08)" }}> 
-        <h1 style={{ textAlign: "center", color: "#7C3AED", fontSize: 32, fontWeight: 700, marginBottom: 4 }}>Zighub</h1> 
-        <p style={{ textAlign: "center", color: "#888", marginBottom: 28, fontSize: 14 }}>Fale em paz.</p> 
+    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#2D0050" }}> 
+      <div style={{ background: "white", borderRadius: 20, padding: 40, width: 360, boxShadow: "0 4px 24px rgba(0,0,0,0.2)" }}> 
+        <h1 style={{ textAlign: "center", color: "#4A0080", fontSize: 42, fontWeight: 800, marginBottom: 4 }}>Zighub</h1> 
+        <p style={{ textAlign: "center", color: "#6B00B3", marginBottom: 28, fontSize: 16, fontWeight: 500 }}>Fale em paz.</p> 
  
-        <button onClick={handleGoogle} disabled={loading} style={{ width: "100%", padding: "10px 0", border: "1px solid #ddd", borderRadius: 8, background: "white", cursor: "pointer", marginBottom: 16, fontSize: 14 }}> 
+        <button  
+          onClick={handleGoogle}  
+          disabled={loading}  
+          style={{  
+            width: "100%",  
+            padding: "12px 0",  
+            border: "2px solid #4A0080",  
+            borderRadius: 16,  
+            background: "white",  
+            cursor: "pointer",  
+            marginBottom: 16,  
+            fontSize: 14, 
+            fontWeight: 600, 
+            color: "#4A0080", 
+            transition: "all 0.2s ease" 
+          }} 
+          onMouseOver={(e) => e.currentTarget.style.background = "#F0E6FF"} 
+          onMouseOut={(e) => e.currentTarget.style.background = "white"} 
+        > 
           Entrar com Google 
         </button> 
  
@@ -74,25 +92,47 @@ export default function LoginPage() {
           placeholder="seu@email.com" 
           value={email} 
           onChange={e => setEmail(e.target.value)} 
-          style={{ width: "100%", padding: "10px 12px", border: "1px solid #ddd", borderRadius: 8, marginBottom: 10, fontSize: 14, boxSizing: "border-box" }} 
+          style={{ width: "100%", padding: "12px 16px", border: "2px solid #9B30FF", borderRadius: 16, marginBottom: 12, fontSize: 14, boxSizing: "border-box", outline: "none", transition: "all 0.2s ease" }} 
+          onFocus={(e) => e.currentTarget.style.borderColor = "#4A0080"} 
+          onBlur={(e) => e.currentTarget.style.borderColor = "#9B30FF"} 
         /> 
         <input 
           type="password" 
           placeholder="••••••••" 
           value={password} 
           onChange={e => setPassword(e.target.value)} 
-          style={{ width: "100%", padding: "10px 12px", border: "1px solid #ddd", borderRadius: 8, marginBottom: 16, fontSize: 14, boxSizing: "border-box" }} 
+          style={{ width: "100%", padding: "12px 16px", border: "2px solid #9B30FF", borderRadius: 16, marginBottom: 16, fontSize: 14, boxSizing: "border-box", outline: "none", transition: "all 0.2s ease" }} 
+          onFocus={(e) => e.currentTarget.style.borderColor = "#4A0080"} 
+          onBlur={(e) => e.currentTarget.style.borderColor = "#9B30FF"} 
         /> 
  
-        {error && <p style={{ color: "red", fontSize: 12, marginBottom: 12 }}>{error}</p>} 
+        {error && <p style={{ color: "#ff4444", fontSize: 12, marginBottom: 12, textAlign: "center" }}>{error}</p>} 
  
-        <button onClick={handleEmail} disabled={loading} style={{ width: "100%", padding: "12px 0", background: "#7C3AED", color: "white", border: "none", borderRadius: 8, cursor: "pointer", fontWeight: 600, fontSize: 15, marginBottom: 16 }}> 
+        <button  
+          onClick={handleEmail}  
+          disabled={loading}  
+          style={{  
+            width: "100%",  
+            padding: "14px 0",  
+            background: "#4A0080",  
+            color: "white",  
+            border: "none",  
+            borderRadius: 16,  
+            cursor: "pointer",  
+            fontWeight: 700,  
+            fontSize: 16,  
+            marginBottom: 16, 
+            transition: "all 0.2s ease" 
+          }} 
+          onMouseOver={(e) => e.currentTarget.style.background = "#6B00B3"} 
+          onMouseOut={(e) => e.currentTarget.style.background = "#4A0080"} 
+        > 
           {loading ? "Aguarde..." : mode === "login" ? "Entrar" : "Cadastrar"} 
         </button> 
  
-        <p style={{ textAlign: "center", fontSize: 13, color: "#666" }}> 
+        <p style={{ textAlign: "center", fontSize: 14, color: "#666" }}> 
           {mode === "login" ? "Não tem conta? " : "Já tem conta? "} 
-          <span onClick={() => setMode(mode === "login" ? "register" : "login")} style={{ color: "#7C3AED", cursor: "pointer", fontWeight: 600 }}> 
+          <span onClick={() => setMode(mode === "login" ? "register" : "login")} style={{ color: "#9B30FF", cursor: "pointer", fontWeight: 700 }}> 
             {mode === "login" ? "Criar conta" : "Entrar"} 
           </span> 
         </p> 
