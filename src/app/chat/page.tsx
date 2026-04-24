@@ -26,22 +26,29 @@ export default function ChatPage() {
       orderBy("lastMessageAt", "desc") 
     ); 
  
-    const unsub = onSnapshot(q, async (snapshot) => { 
-      const convs = await Promise.all( 
-        snapshot.docs.map(async (d) => { 
-          const data = d.data(); 
-          const otherUid = data.participants.find((uid: string) => uid !== user.uid); 
-          if (!otherUid) return null; 
-          const userSnap = await getDoc(doc(db, "users", otherUid)); 
-          return { 
-            id: d.id, 
-            ...data, 
-            otherUser: userSnap.exists() ? userSnap.data() : null 
-          }; 
-        }) 
-      ); 
-      setConversations(convs.filter(Boolean)); 
-    }); 
+    const unsub = onSnapshot(q, 
+      async (snapshot) => { 
+        console.log("onSnapshot disparou, docs:", snapshot.docs.length); 
+        const convs = await Promise.all( 
+          snapshot.docs.map(async (d) => { 
+            const data = d.data(); 
+            const otherUid = data.participants.find((uid: string) => uid !== user.uid); 
+            if (!otherUid) return null; 
+            const userSnap = await getDoc(doc(db, "users", otherUid)); 
+            return { 
+              id: d.id, 
+              ...data, 
+              otherUser: userSnap.exists() ? userSnap.data() : null 
+            }; 
+          }) 
+        ); 
+        setConversations(convs.filter(Boolean)); 
+        console.log("Conversas carregadas:", convs.filter(Boolean).length); 
+      }, 
+      (error) => { 
+        console.error("onSnapshot error:", error); 
+      } 
+    ); 
  
     return () => unsub(); 
   }, [user]);
