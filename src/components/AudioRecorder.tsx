@@ -38,7 +38,8 @@ export default function AudioRecorder({ convId, senderId }: AudioRecorderProps) 
                   mimeType.includes("ogg") ? "ogg" : "webm";
       const storageRef = ref(storage, `conversations/${convId}/audio/${timestamp}.${ext}`);
       
-      const snapshot = await uploadBytes(storageRef, audioBlob);
+      const metadata = { contentType: mimeType || "audio/webm;codecs=opus" }; 
+      const snapshot = await uploadBytes(storageRef, audioBlob, metadata);
       const downloadUrl = await getDownloadURL(snapshot.ref);
       
       await sendAudioMessage(convId, senderId, downloadUrl, duration);
