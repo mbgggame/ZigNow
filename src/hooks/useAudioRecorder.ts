@@ -6,14 +6,16 @@
  
  function getSupportedMimeType(): string { 
    const types = [ 
+     "audio/mp4", 
      "audio/webm;codecs=opus", 
      "audio/webm", 
      "audio/ogg;codecs=opus", 
      "audio/ogg", 
-     "audio/mp4", 
    ]; 
    for (const type of types) { 
-     if (MediaRecorder.isTypeSupported(type)) return type; 
+     if (typeof MediaRecorder !== "undefined" && MediaRecorder.isTypeSupported(type)) { 
+       return type; 
+     } 
    } 
    return ""; 
  } 
@@ -48,7 +50,8 @@
        }; 
  
        recorder.onstop = () => { 
-         const blob = new Blob(chunksRef.current, { type: mime || "audio/webm" }); 
+         const finalMime = mime || "audio/webm"; 
+         const blob = new Blob(chunksRef.current, { type: finalMime }); 
          const url = URL.createObjectURL(blob); 
          setAudioBlob(blob); 
          setAudioUrl(url); 

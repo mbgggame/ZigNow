@@ -18,6 +18,7 @@ export default function AudioRecorder({ convId, senderId }: AudioRecorderProps) 
     audioBlob,
     audioUrl,
     duration,
+    mimeType,
     startRecording,
     stopRecording,
     cancelRecording
@@ -33,7 +34,9 @@ export default function AudioRecorder({ convId, senderId }: AudioRecorderProps) 
     setIsUploading(true);
     try {
       const timestamp = Date.now();
-      const storageRef = ref(storage, `conversations/${convId}/audio/${timestamp}.webm`);
+      const ext = mimeType.includes("mp4") ? "mp4" : 
+                  mimeType.includes("ogg") ? "ogg" : "webm";
+      const storageRef = ref(storage, `conversations/${convId}/audio/${timestamp}.${ext}`);
       
       const snapshot = await uploadBytes(storageRef, audioBlob);
       const downloadUrl = await getDownloadURL(snapshot.ref);
