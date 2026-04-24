@@ -198,7 +198,7 @@ export default function ChatArea({ convId }: ChatAreaProps) {
       {/* Input Area */}
       <div className="p-4 bg-white border-t border-gray-100 z-10">
         <div className="max-w-4xl mx-auto flex items-end gap-3">
-          <AudioRecorder convId={convId} senderId={user?.uid || ""} />
+          {convId && <AudioRecorder convId={convId} senderId={user?.uid || ""} />} 
           <form onSubmit={handleSendMessage} className="flex-1 flex items-end gap-3">
             <div className="flex-1 bg-gray-50 rounded-2xl border border-gray-100 px-4 py-2.5 focus-within:bg-white focus-within:border-[#7C3AED] focus-within:ring-1 focus-within:ring-[#7C3AED] transition-all">
             <textarea
