@@ -1,54 +1,66 @@
 "use client"; 
- 
-interface Props { 
-  conversations?: any[]; 
-  selectedId?: string | null; 
-  onSelect?: (id: string) => void; 
-  activeConvId?: string | null; 
-  onSelectConv?: (id: string) => void; 
-} 
- 
-export default function ConversationList({ conversations, selectedId, onSelect, activeConvId, onSelectConv }: Props) { 
-  console.log("ConversationList props:", conversations?.length, activeConvId); 
-  const convId = selectedId ?? activeConvId ?? null; 
-  const handleSelect = onSelect ?? onSelectConv ?? (() => {}); 
-
-  if (!conversations || conversations.length === 0) { 
-    return ( 
-      <div style={{ padding: 24, textAlign: "center", color: "#aaa" }}> 
-        <p style={{ fontSize: 13 }}>Nenhuma conversa encontrada.</p> 
-        <p style={{ fontSize: 12, marginTop: 4, fontStyle: "italic" }}>Busque um @username para começar!</p> 
-      </div> 
-    ); 
-  } 
-  return ( 
-    <div style={{ overflowY: "auto" }}> 
-      {conversations.map((conv) => ( 
-        <div 
-          key={conv.id} 
-          onClick={() => handleSelect(conv.id)} 
-          style={{ 
-            display: "flex", alignItems: "center", gap: 12, 
-            padding: "12px 16px", cursor: "pointer", 
-            borderBottom: "1px solid #f5f5f5", 
-            background: convId === conv.id ? "#f5f0ff" : "white" 
-          }} 
-        > 
-          <img 
-            src={conv.otherUser?.photoURL || "https://www.gravatar.com/avatar?d=mp"} 
-            style={{ width: 40, height: 40, borderRadius: "50%", objectFit: "cover" }} 
-            alt="" 
-          /> 
-          <div style={{ flex: 1, minWidth: 0 }}> 
-            <p style={{ fontSize: 13, fontWeight: 600, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}> 
-              {conv.otherUser?.displayName || "..."} 
-            </p> 
-            <p style={{ fontSize: 12, color: "#888", margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}> 
-              {conv.lastMessage || "Nova conversa"} 
-            </p> 
-          </div> 
-        </div> 
-      ))} 
-    </div> 
-  ); 
-} 
+  
+ interface Props { 
+   conversations?: any[]; 
+   selectedId?: string | null; 
+   onSelect?: (id: string) => void; 
+   activeConvId?: string | null; 
+   onSelectConv?: (id: string) => void; 
+ } 
+  
+ export default function ConversationList({ conversations, selectedId, onSelect, activeConvId, onSelectConv }: Props) { 
+   console.log("ConversationList renderizando:", conversations?.length); 
+   const convId = selectedId ?? activeConvId ?? null; 
+   const handleSelect = onSelect ?? onSelectConv ?? (() => {}); 
+  
+   if (!conversations || conversations.length === 0) { 
+     return ( 
+       <div style={{ padding: 24, textAlign: "center", color: "#aaa" }}> 
+         <p style={{ fontSize: 13 }}>Nenhuma conversa encontrada.</p> 
+         <p style={{ fontSize: 12, marginTop: 4, fontStyle: "italic" }}>Busque um @username para começar!</p> 
+       </div> 
+     ); 
+   } 
+  
+   return ( 
+     <div style={{ overflowY: "auto", flex: 1 }}> 
+       {conversations.map((conv) => { 
+         console.log("Renderizando conv:", conv.id, conv.otherUser?.displayName); 
+         return ( 
+           <div 
+             key={conv.id} 
+             onClick={() => handleSelect(conv.id)} 
+             style={{ 
+               display: "flex", 
+               alignItems: "center", 
+               gap: 12, 
+               padding: "12px 16px", 
+               cursor: "pointer", 
+               borderBottom: "1px solid #f5f5f5", 
+               background: convId === conv.id ? "#f5f0ff" : "white" 
+             }} 
+           > 
+             <img 
+               src={conv.otherUser?.photoURL || "https://www.gravatar.com/avatar?d=mp"} 
+               style={{ width: 40, height: 40, borderRadius: "50%", objectFit: "cover" }} 
+               alt="" 
+             /> 
+             <div style={{ flex: 1, minWidth: 0 }}> 
+               <p style={{ fontSize: 13, fontWeight: 600, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}> 
+                 {conv.otherUser?.displayName || conv.id} 
+               </p> 
+               <p style={{ fontSize: 12, color: "#888", margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}> 
+                 {conv.lastMessage || "Nova conversa"} 
+               </p> 
+             </div> 
+             {conv.unreadCount?.[conv.otherUser?.uid] > 0 && ( 
+               <div style={{ background: "#7C3AED", color: "white", borderRadius: "50%", width: 20, height: 20, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700 }}> 
+                 {conv.unreadCount[conv.otherUser?.uid]} 
+               </div> 
+             )} 
+           </div> 
+         ); 
+       })} 
+     </div> 
+   ); 
+ } 
