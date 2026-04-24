@@ -110,8 +110,12 @@ export default function Sidebar({ activeConvId, onSelectConv }: SidebarProps) {
       <div className="flex-1 overflow-y-auto">
         {isSearching ? (
           <UserSearch 
-            onSelectUser={(u: any) => handleSelectUser(u)} 
-          />
+            onClose={() => setIsSearching(false)} 
+            onSelectConv={(id: string) => { 
+              onSelectConv(id); 
+              setIsSearching(false); 
+            }} 
+          /> 
         ) : (
           <ConversationList 
             conversations={conversations}
