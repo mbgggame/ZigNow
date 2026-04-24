@@ -1,12 +1,17 @@
 "use client"; 
  
 interface Props { 
-  conversations: any[]; 
-  selectedId: string | null; 
-  onSelect: (id: string) => void; 
+  conversations?: any[]; 
+  selectedId?: string | null; 
+  onSelect?: (id: string) => void; 
+  activeConvId?: string | null; 
+  onSelectConv?: (id: string) => void; 
 } 
  
-export default function ConversationList({ conversations, selectedId, onSelect }: Props) { 
+export default function ConversationList({ conversations, selectedId, onSelect, activeConvId, onSelectConv }: Props) { 
+  const convId = selectedId ?? activeConvId ?? null; 
+  const handleSelect = onSelect ?? onSelectConv ?? (() => {}); 
+
   if (!conversations || conversations.length === 0) { 
     return ( 
       <div style={{ padding: 24, textAlign: "center", color: "#aaa" }}> 
@@ -20,12 +25,12 @@ export default function ConversationList({ conversations, selectedId, onSelect }
       {conversations.map((conv) => ( 
         <div 
           key={conv.id} 
-          onClick={() => onSelect(conv.id)} 
+          onClick={() => handleSelect(conv.id)} 
           style={{ 
             display: "flex", alignItems: "center", gap: 12, 
             padding: "12px 16px", cursor: "pointer", 
             borderBottom: "1px solid #f5f5f5", 
-            background: selectedId === conv.id ? "#f5f0ff" : "white" 
+            background: convId === conv.id ? "#f5f0ff" : "white" 
           }} 
         > 
           <img 

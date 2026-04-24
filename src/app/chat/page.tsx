@@ -61,7 +61,7 @@ export default function ChatPage() {
             {isSearching ? (
               <UserSearch 
                 onClose={() => setIsSearching(false)} 
-                onSelectConv={(id) => {
+                onSelectConv={(id: string) => {
                   setActiveConvId(id);
                   setIsSearching(false);
                 }} 
