@@ -9,6 +9,7 @@ interface Props {
 } 
  
 export default function ConversationList({ conversations, selectedId, onSelect, activeConvId, onSelectConv }: Props) { 
+  console.log("ConversationList props:", conversations?.length, activeConvId); 
   const convId = selectedId ?? activeConvId ?? null; 
   const handleSelect = onSelect ?? onSelectConv ?? (() => {}); 
 
