@@ -83,43 +83,14 @@ export async function getOrCreateConversation(uid1: string, uid2: string) {
 
 // 4. sendMessage(convId, senderId, text)
 export async function sendMessage(convId: string, senderId: string, text: string) { 
-   const msgHash = CryptoJS.SHA1(text).toString(); 
-   const rateLimitRef = doc(db, "rateLimits", senderId); 
    const convRef = doc(db, "conversations", convId); 
    const messagesRef = collection(db, "conversations", convId, "messages"); 
    const newMessageRef = doc(messagesRef); 
  
    await runTransaction(db, async (transaction) => { 
-     // ── TODOS OS READS PRIMEIRO ── 
-     const rateLimitDoc = await transaction.get(rateLimitRef); 
      const convDoc = await transaction.get(convRef); 
- 
-     // ── LÓGICA ── 
-     const now = Timestamp.now(); 
-     const data = rateLimitDoc.data(); 
- 
-     if (data) { 
-       const windowStart = data.windowStart.toDate(); 
-       const diffMinutes = (now.toDate().getTime() - windowStart.getTime()) / 60000; 
-       if (diffMinutes < 1 && data.msgCount >= 30) throw new Error("Rate limit exceeded"); 
-       if (data.lastMsg === msgHash) throw new Error("Duplicate message blocked"); 
-     } 
- 
      const participants = convDoc.data()?.participants || []; 
      const recipientId = participants.find((p: string) => p !== senderId); 
- 
-     // ── TODOS OS WRITES DEPOIS ── 
-     if (!data) { 
-       transaction.set(rateLimitRef, { msgCount: 1, windowStart: now, lastMsg: msgHash }); 
-     } else { 
-       const windowStart = data.windowStart.toDate(); 
-       const diffMinutes = (now.toDate().getTime() - windowStart.getTime()) / 60000; 
-       if (diffMinutes >= 1) { 
-         transaction.update(rateLimitRef, { msgCount: 1, windowStart: now, lastMsg: msgHash }); 
-       } else { 
-         transaction.update(rateLimitRef, { msgCount: increment(1), lastMsg: msgHash }); 
-       } 
-     } 
  
      transaction.set(newMessageRef, { 
        senderId, 
