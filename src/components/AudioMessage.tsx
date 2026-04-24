@@ -49,7 +49,9 @@ import { Play, Pause } from "lucide-react";
          src={audioUrl} 
          onTimeUpdate={() => setCurrentTime(audioRef.current?.currentTime || 0)} 
          onEnded={() => { setIsPlaying(false); setCurrentTime(0); }} 
+         onError={(e) => console.error("Audio error:", e)} 
          preload="auto" 
+         crossOrigin="anonymous" 
        /> 
        {!isPlaying && ( 
          <a 
