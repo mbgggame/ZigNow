@@ -34,11 +34,10 @@ export default function AudioRecorder({ convId, senderId }: AudioRecorderProps) 
     setIsUploading(true);
     try {
       const timestamp = Date.now();
-      const ext = mimeType.includes("mp4") ? "mp4" : 
-                  mimeType.includes("ogg") ? "ogg" : "webm";
+      const ext = "wav";
       const storageRef = ref(storage, `conversations/${convId}/audio/${timestamp}.${ext}`);
       
-      const metadata = { contentType: mimeType || "audio/webm;codecs=opus" }; 
+      const metadata = { contentType: mimeType || "audio/wav" }; 
       const snapshot = await uploadBytes(storageRef, audioBlob, metadata);
       const downloadUrl = await getDownloadURL(snapshot.ref);
       
