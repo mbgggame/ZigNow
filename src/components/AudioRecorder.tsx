@@ -35,12 +35,12 @@ export default function AudioRecorder({ convId, senderId }: AudioRecorderProps) 
     setIsUploading(true); 
     try { 
       const timestamp = Date.now(); 
-      const ext = "wav"; 
+      const ext = mimeType.includes("mp4") ? "mp4" : mimeType.includes("ogg") ? "ogg" : "webm"; 
       const path = `conversations/${convId}/audio/${timestamp}.${ext}`; 
       console.log("Upload path:", path); 
       
       const storageRef = ref(storage, path); 
-      const metadata = { contentType: "audio/wav" }; 
+      const metadata = { contentType: mimeType }; 
       console.log("Iniciando upload..."); 
       const snapshot = await uploadBytes(storageRef, audioBlob, metadata); 
       console.log("Upload concluído:", snapshot.ref.fullPath); 

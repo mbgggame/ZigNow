@@ -3,54 +3,12 @@
  
  export type RecorderState = "idle" | "recording" | "recorded"; 
  
- async function convertToWav(blob: Blob): Promise<Blob> { 
-   const audioContext = new AudioContext(); 
-   const arrayBuffer = await blob.arrayBuffer(); 
-   const audioBuffer = await audioContext.decodeAudioData(arrayBuffer); 
-   
-   const numChannels = audioBuffer.numberOfChannels; 
-   const sampleRate = audioBuffer.sampleRate; 
-   const numSamples = audioBuffer.length; 
-   const buffer = new ArrayBuffer(44 + numSamples * numChannels * 2); 
-   const view = new DataView(buffer); 
-   
-   const writeString = (offset: number, str: string) => { 
-     for (let i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i)); 
-   }; 
-   
-   writeString(0, "RIFF"); 
-   view.setUint32(4, 36 + numSamples * numChannels * 2, true); 
-   writeString(8, "WAVE"); 
-   writeString(12, "fmt "); 
-   view.setUint32(16, 16, true); 
-   view.setUint16(20, 1, true); 
-   view.setUint16(22, numChannels, true); 
-   view.setUint32(24, sampleRate, true); 
-   view.setUint32(28, sampleRate * numChannels * 2, true); 
-   view.setUint16(32, numChannels * 2, true); 
-   view.setUint16(34, 16, true); 
-   writeString(36, "data"); 
-   view.setUint32(40, numSamples * numChannels * 2, true); 
-   
-   let offset = 44; 
-   for (let i = 0; i < numSamples; i++) { 
-     for (let ch = 0; ch < numChannels; ch++) { 
-       const sample = Math.max(-1, Math.min(1, audioBuffer.getChannelData(ch)[i])); 
-       view.setInt16(offset, sample * 0x7fff, true); 
-       offset += 2; 
-     } 
-   } 
-   
-   await audioContext.close(); 
-   return new Blob([buffer], { type: "audio/wav" }); 
- } 
- 
  export function useAudioRecorder() { 
    const [state, setState] = useState<RecorderState>("idle"); 
    const [audioBlob, setAudioBlob] = useState<Blob | null>(null); 
    const [audioUrl, setAudioUrl] = useState<string>(""); 
    const [duration, setDuration] = useState(0); 
-   const mimeType = "audio/wav"; 
+   const mimeType = "audio/webm"; 
  
    const mediaRecorderRef = useRef<MediaRecorder | null>(null); 
    const chunksRef = useRef<Blob[]>([]); 
@@ -60,10 +18,7 @@
    const startRecording = async () => { 
      try { 
        const stream = await navigator.mediaDevices.getUserMedia({ audio: true }); 
-       const options = MediaRecorder.isTypeSupported("audio/webm") 
-         ? { mimeType: "audio/webm" } 
-         : {}; 
-       const recorder = new MediaRecorder(stream, options); 
+       const recorder = new MediaRecorder(stream); 
  
        mediaRecorderRef.current = recorder; 
        chunksRef.current = []; 
@@ -72,22 +27,14 @@
          if (e.data.size > 0) chunksRef.current.push(e.data); 
        }; 
  
-       recorder.onstop = async () => { 
-         const rawBlob = new Blob(chunksRef.current, { type: "audio/webm" }); 
-         stream.getTracks().forEach(track => track.stop()); 
-         
-         try { 
-           const wavBlob = await convertToWav(rawBlob); 
-           const url = URL.createObjectURL(wavBlob); 
-           setAudioBlob(wavBlob); 
-           setAudioUrl(url); 
-         } catch (err) { 
-           console.error("Conversion error:", err); 
-           const url = URL.createObjectURL(rawBlob); 
-           setAudioBlob(rawBlob); 
-           setAudioUrl(url); 
-         } 
+       recorder.onstop = () => { 
+         const blob = new Blob(chunksRef.current, { type: recorder.mimeType }); 
+         console.log("Gravado com mimeType:", recorder.mimeType, "tamanho:", blob.size); 
+         const url = URL.createObjectURL(blob); 
+         setAudioBlob(blob); 
+         setAudioUrl(url); 
          setState("recorded"); 
+         stream.getTracks().forEach(track => track.stop()); 
        }; 
  
        recorder.start(100); 
