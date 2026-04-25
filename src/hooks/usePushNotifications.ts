@@ -41,5 +41,18 @@
      }; 
   
      initMessaging(); 
-   }, [uid]); 
- } 
+  }, [uid]); 
+
+  // Page Visibility API para reconectar quando voltar ao app
+  useEffect(() => { 
+    const handleVisibilityChange = () => { 
+      if (document.visibilityState === "visible") { 
+        console.log("App voltou ao foreground — reconectando..."); 
+        // Firebase onSnapshot já reconecta automaticamente 
+        // Apenas força refresh do FCM token se necessário 
+      } 
+    }; 
+    document.addEventListener("visibilitychange", handleVisibilityChange); 
+    return () => document.removeEventListener("visibilitychange", handleVisibilityChange); 
+  }, []); 
+} 

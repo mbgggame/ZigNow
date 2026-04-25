@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/hooks/useAuthContext";
@@ -13,10 +13,31 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "Zighub",
-  description: "Mensageiro privado 1 a 1",
-};
+export const viewport: Viewport = { 
+  themeColor: "#4A0080", 
+  width: "device-width", 
+  initialScale: 1, 
+  maximumScale: 1, 
+  userScalable: false, 
+}; 
+ 
+export const metadata: Metadata = { 
+  title: "Zighub", 
+  description: "Fale em paz.", 
+  manifest: "/manifest.json", 
+  appleWebApp: { 
+    capable: true, 
+    statusBarStyle: "black-translucent", 
+    title: "Zighub", 
+  }, 
+  other: { 
+    "mobile-web-app-capable": "yes", 
+    "apple-mobile-web-app-capable": "yes", 
+    "apple-mobile-web-app-status-bar-style": "black-translucent", 
+    "apple-mobile-web-app-title": "Zighub", 
+    "msapplication-TileColor": "#4A0080", 
+  } 
+}; 
 
 export default function RootLayout({
   children,

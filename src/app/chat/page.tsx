@@ -59,6 +59,36 @@ export default function ChatPage() {
     return () => unsub(); 
   }, [user]);
 
+  // Prevenir sleep no mobile (Wake Lock API)
+  useEffect(() => { 
+    let wakeLock: any = null; 
+     
+    const requestWakeLock = async () => { 
+      try { 
+        if ("wakeLock" in navigator) { 
+          wakeLock = await (navigator as any).wakeLock.request("screen"); 
+          console.log("Wake lock ativado"); 
+        } 
+      } catch (err) { 
+        console.log("Wake lock não suportado:", err); 
+      } 
+    }; 
+ 
+    const handleVisibility = () => { 
+      if (document.visibilityState === "visible") { 
+        requestWakeLock(); 
+      } 
+    }; 
+ 
+    requestWakeLock(); 
+    document.addEventListener("visibilitychange", handleVisibility); 
+     
+    return () => { 
+      document.removeEventListener("visibilitychange", handleVisibility); 
+      wakeLock?.release(); 
+    }; 
+  }, []); 
+
   return (
     <AuthGuard>
       <div className="flex h-screen w-screen bg-[#F0E6FF] overflow-hidden font-sans text-gray-900">
