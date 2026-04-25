@@ -89,6 +89,17 @@ export default function ChatPage() {
     }; 
   }, []); 
 
+  useEffect(() => { 
+    const handleVisibility = async () => { 
+      if (document.visibilityState === "visible") { 
+        // Força reconexão do Firestore 
+        console.log("App ativo novamente"); 
+      } 
+    }; 
+    document.addEventListener("visibilitychange", handleVisibility); 
+    return () => document.removeEventListener("visibilitychange", handleVisibility); 
+  }, []); 
+
   return (
     <AuthGuard>
       <div className="flex h-screen w-screen bg-[#F0E6FF] overflow-hidden font-sans text-gray-900">

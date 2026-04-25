@@ -36,6 +36,8 @@ export default function ChatArea({ convId }: ChatAreaProps) {
     state: callState,
     callData,
     token: callToken,
+    ringtoneType,
+    changeRingtone,
     startCall,
     acceptCall,
     rejectCall,
@@ -201,6 +203,8 @@ export default function ChatArea({ convId }: ChatAreaProps) {
         onAccept={acceptCall}
         onReject={rejectCall}
         onEnd={endCall}
+        ringtoneType={ringtoneType}
+        onChangeRingtone={changeRingtone}
       />
 
       {/* Input Area */}

@@ -18,6 +18,8 @@ interface CallOverlayProps {
   onAccept: () => void;
   onReject: () => void;
   onEnd: () => void;
+  ringtoneType: "phone" | "birimbau"; 
+  onChangeRingtone: (type: "phone" | "birimbau") => void; 
 }
 
 export default function CallOverlay({ 
@@ -26,7 +28,9 @@ export default function CallOverlay({
   token, 
   onAccept, 
   onReject, 
-  onEnd 
+  onEnd,
+  ringtoneType,
+  onChangeRingtone
 }: CallOverlayProps) {
   const [duration, setDuration] = useState(0);
 
@@ -46,7 +50,36 @@ export default function CallOverlay({
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
-  if (state === "idle") return null;
+  if (state === "idle") {
+    return (
+      <div style={{ 
+        position: "fixed", bottom: 80, right: 16, 
+        background: "#4A0080", borderRadius: 20, padding: "8px 16px", 
+        display: "flex", gap: 8, alignItems: "center", zIndex: 100, 
+        boxShadow: "0 4px 20px rgba(74,0,128,0.4)" 
+      }}> 
+        <span style={{fontSize: 12, color: "white", opacity: 0.8}}>Som:</span> 
+        <button 
+          onClick={() => onChangeRingtone("phone")} 
+          style={{ 
+            background: ringtoneType === "phone" ? "white" : "transparent", 
+            color: ringtoneType === "phone" ? "#4A0080" : "white", 
+            border: "1px solid white", borderRadius: 12, 
+            padding: "4px 10px", fontSize: 11, cursor: "pointer" 
+          }} 
+        >📞 Telefone</button> 
+        <button 
+          onClick={() => onChangeRingtone("birimbau")} 
+          style={{ 
+            background: ringtoneType === "birimbau" ? "white" : "transparent", 
+            color: ringtoneType === "birimbau" ? "#4A0080" : "white", 
+            border: "1px solid white", borderRadius: 12, 
+            padding: "4px 10px", fontSize: 11, cursor: "pointer" 
+          }} 
+        >🎵 Birimbau</button> 
+      </div> 
+    );
+  }
 
   return (
     <div className="absolute inset-0 z-50 flex items-center justify-center bg-gray-900/80 backdrop-blur-sm animate-in fade-in duration-300">

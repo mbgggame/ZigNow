@@ -6,44 +6,64 @@ import { db } from "@/lib/firebase";
 import { doc, onSnapshot } from "firebase/firestore";
 import { startCallRecord, updateCallStatus } from "@/lib/firestore";
 
-function createRingtone() { 
+function createPhoneRingtone() { 
   if (typeof window === "undefined") return null; 
   const ctx = new AudioContext(); 
-  
   const playRing = () => { 
     const osc1 = ctx.createOscillator(); 
     const osc2 = ctx.createOscillator(); 
     const gain = ctx.createGain(); 
-    
-    osc1.connect(gain); 
-    osc2.connect(gain); 
-    gain.connect(ctx.destination); 
-    
-    osc1.frequency.value = 480; 
-    osc2.frequency.value = 620; 
-    osc1.type = "sine"; 
-    osc2.type = "sine"; 
-    
+    osc1.connect(gain); osc2.connect(gain); gain.connect(ctx.destination); 
+    osc1.frequency.value = 480; osc2.frequency.value = 620; 
+    osc1.type = "sine"; osc2.type = "sine"; 
     gain.gain.setValueAtTime(0.3, ctx.currentTime); 
     gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.5); 
-    
-    osc1.start(ctx.currentTime); 
-    osc2.start(ctx.currentTime); 
-    osc1.stop(ctx.currentTime + 1.5); 
-    osc2.stop(ctx.currentTime + 1.5); 
+    osc1.start(ctx.currentTime); osc2.start(ctx.currentTime); 
+    osc1.stop(ctx.currentTime + 1.5); osc2.stop(ctx.currentTime + 1.5); 
   }; 
-
   let interval: NodeJS.Timeout | null = null; 
-  
   return { 
-    start: () => { 
-      playRing(); 
-      interval = setInterval(playRing, 3000); 
-    }, 
-    stop: () => { 
-      if (interval) clearInterval(interval); 
-      ctx.close(); 
-    } 
+    start: () => { playRing(); interval = setInterval(playRing, 3000); }, 
+    stop: () => { if (interval) clearInterval(interval); ctx.close(); } 
+  }; 
+} 
+
+function createBirimbauRingtone() { 
+  if (typeof window === "undefined") return null; 
+  const ctx = new AudioContext(); 
+  
+  const playBirimbau = () => { 
+    const notes = [220, 246, 261, 293, 246, 220, 196, 220]; 
+    notes.forEach((freq, i) => { 
+      const osc = ctx.createOscillator(); 
+      const gain = ctx.createGain(); 
+      const filter = ctx.createBiquadFilter(); 
+      
+      filter.type = "bandpass"; 
+      filter.frequency.value = freq * 2; 
+      filter.Q.value = 5; 
+      
+      osc.connect(filter); 
+      filter.connect(gain); 
+      gain.connect(ctx.destination); 
+      
+      osc.type = "sawtooth"; 
+      osc.frequency.value = freq; 
+      
+      const t = ctx.currentTime + i * 0.18; 
+      gain.gain.setValueAtTime(0, t); 
+      gain.gain.linearRampToValueAtTime(0.4, t + 0.02); 
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.3); 
+      
+      osc.start(t); 
+      osc.stop(t + 0.35); 
+    }); 
+  }; 
+  
+  let interval: NodeJS.Timeout | null = null; 
+  return { 
+    start: () => { playBirimbau(); interval = setInterval(playBirimbau, 3500); }, 
+    stop: () => { if (interval) clearInterval(interval); ctx.close(); } 
   }; 
 } 
 
@@ -54,13 +74,24 @@ export function useCall(convId: string | null) {
   const [state, setState] = useState<CallState>("idle");
   const [callData, setCallData] = useState<any>(null);
   const [token, setToken] = useState<string | null>(null);
-  const ringtoneRef = useRef<ReturnType<typeof createRingtone>>(null);
+  const ringtoneRef = useRef<{ start: () => void; stop: () => void } | null>(null);
+
+  const [ringtoneType, setRingtoneType] = useState<"phone" | "birimbau">( 
+    () => (typeof window !== "undefined" ? localStorage.getItem("zighub_ringtone") as "phone" | "birimbau" : "phone") || "phone" 
+  ); 
+
+  const changeRingtone = (type: "phone" | "birimbau") => { 
+    setRingtoneType(type); 
+    localStorage.setItem("zighub_ringtone", type); 
+  }; 
 
   // Phone ringtone effect
   useEffect(() => {
     if (state === "calling" || state === "receiving") {
       if (!ringtoneRef.current) {
-        ringtoneRef.current = createRingtone();
+        ringtoneRef.current = ringtoneType === "birimbau" 
+          ? createBirimbauRingtone() 
+          : createPhoneRingtone(); 
         ringtoneRef.current?.start();
       }
     } else if (state === "inCall" || state === "idle" || state === "rejected") {
@@ -69,7 +100,7 @@ export function useCall(convId: string | null) {
         ringtoneRef.current = null;
       }
     }
-  }, [state]);
+  }, [state, ringtoneType]);
 
   // Listen for incoming calls
   useEffect(() => {
@@ -138,6 +169,8 @@ export function useCall(convId: string | null) {
     state,
     callData,
     token,
+    ringtoneType,
+    changeRingtone,
     startCall,
     acceptCall,
     rejectCall,
