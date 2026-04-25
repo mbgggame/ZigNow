@@ -13,13 +13,9 @@ importScripts('https://www.gstatic.com/firebasejs/10.0.0/firebase-app-compat.js'
  const messaging = firebase.messaging(); 
   
  messaging.onBackgroundMessage((payload) => { 
-   const { title, body } = payload.notification; 
-   self.registration.showNotification(title, { 
-     body, 
-     icon: '/favicon.ico', 
-     badge: '/favicon.ico', 
-     data: payload.data 
-   }); 
+   // Não mostra notificação aqui — a Cloud Function já enviou 
+   // Apenas processa o dado para o notificationclick 
+   console.log('Background message received:', payload); 
  }); 
   
  self.addEventListener('notificationclick', (event) => { 
@@ -28,6 +24,7 @@ importScripts('https://www.gstatic.com/firebasejs/10.0.0/firebase-app-compat.js'
    const url = convId  
      ? `https://zig-now-2bpo.vercel.app/chat?conv=${convId}` 
      : 'https://zig-now-2bpo.vercel.app/chat'; 
+    
    event.waitUntil( 
      clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => { 
        for (const client of clientList) { 

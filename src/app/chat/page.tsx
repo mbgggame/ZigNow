@@ -12,12 +12,10 @@ import { db } from "@/lib/firebase";
 import { usePushNotifications } from "@/hooks/usePushNotifications"; 
 import SecurityAlert from "@/components/SecurityAlert"; 
 import { useSecurityMonitor } from "@/hooks/useSecurityMonitor"; 
-import { useSearchParams } from "next/navigation"; 
 
 export default function ChatPage() {
   const { userData, logout, user } = useAuthContext();
   const { threatDetected, dismissAlert } = useSecurityMonitor();
-  const searchParams = useSearchParams();
   const [activeConvId, setActiveConvId] = useState<string | null>(null);
   const [isSearching, setIsSearching] = useState(false);
   const [conversations, setConversations] = useState<any[]>([]); 
@@ -75,11 +73,15 @@ export default function ChatPage() {
    }, []); 
  
    useEffect(() => { 
-     const convId = searchParams.get("conv"); 
+     if (typeof window === "undefined") return; 
+     const params = new URLSearchParams(window.location.search); 
+     const convId = params.get("conv"); 
      if (convId) { 
        setActiveConvId(convId); 
+       // Limpa o parâmetro da URL sem recarregar 
+       window.history.replaceState({}, "", "/chat"); 
      } 
-   }, [searchParams]); 
+   }, []); 
  
    // Prevenir sleep no mobile (Wake Lock API)
   useEffect(() => { 
