@@ -1,58 +1,56 @@
 "use client"; 
- import { useEffect } from "react"; 
+ import { useEffect, useState } from "react"; 
  import { getMessaging, getToken, onMessage } from "firebase/messaging"; 
  import { doc, updateDoc } from "firebase/firestore"; 
  import { app, db } from "@/lib/firebase"; 
-  
+ 
  export function usePushNotifications(uid: string | undefined) { 
+   const [permission, setPermission] = useState<NotificationPermission>("default"); 
+ 
    useEffect(() => { 
+     if (typeof window !== "undefined" && "Notification" in window) { 
+       setPermission(Notification.permission); 
+     } 
+   }, []); 
+ 
+   const requestPermission = async () => { 
      if (!uid || typeof window === "undefined") return; 
      if (!("Notification" in window)) return; 
-  
-     const initMessaging = async () => { 
-       try { 
-         const permission = await Notification.requestPermission(); 
-         if (permission !== "granted") return; 
-  
-         const messaging = getMessaging(app); 
-          
-         const token = await getToken(messaging, { 
-           vapidKey: process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY, 
-           serviceWorkerRegistration: await navigator.serviceWorker.register("/firebase-messaging-sw.js") 
-         }); 
-  
-         if (token) { 
-           await updateDoc(doc(db, "users", uid), { fcmToken: token }); 
-           console.log("FCM token salvo:", token.substring(0, 20) + "..."); 
-         } 
-  
-         onMessage(messaging, (payload) => { 
-           console.log("Mensagem recebida em foreground:", payload); 
-           if (payload.notification) { 
-             new Notification(payload.notification.title || "Zighub", { 
-               body: payload.notification.body, 
-               icon: "/favicon.ico" 
-             }); 
-           } 
-         }); 
-       } catch (err) { 
-         console.error("Erro ao inicializar FCM:", err); 
+ 
+     try { 
+       const result = await Notification.requestPermission(); 
+       setPermission(result); 
+       
+       if (result !== "granted") return; 
+ 
+       const registration = await navigator.serviceWorker.register( 
+         "/firebase-messaging-sw.js" 
+       ); 
+       await navigator.serviceWorker.ready; 
+ 
+       const messaging = getMessaging(app); 
+       const token = await getToken(messaging, { 
+         vapidKey: process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY, 
+         serviceWorkerRegistration: registration 
+       }); 
+ 
+       if (token) { 
+         await updateDoc(doc(db, "users", uid), { fcmToken: token }); 
+         console.log("FCM token salvo"); 
        } 
-     }; 
-  
-     initMessaging(); 
-  }, [uid]); 
-
-  // Page Visibility API para reconectar quando voltar ao app
-  useEffect(() => { 
-    const handleVisibilityChange = () => { 
-      if (document.visibilityState === "visible") { 
-        console.log("App voltou ao foreground — reconectando..."); 
-        // Firebase onSnapshot já reconecta automaticamente 
-        // Apenas força refresh do FCM token se necessário 
-      } 
-    }; 
-    document.addEventListener("visibilitychange", handleVisibilityChange); 
-    return () => document.removeEventListener("visibilitychange", handleVisibilityChange); 
-  }, []); 
-} 
+ 
+       onMessage(messaging, (payload) => { 
+         if (payload.notification) { 
+           new Notification(payload.notification.title || "Zighub", { 
+             body: payload.notification.body, 
+             icon: "/icon-192.png" 
+           }); 
+         } 
+       }); 
+     } catch (err) { 
+       console.error("Erro FCM:", err); 
+     } 
+   }; 
+ 
+   return { permission, requestPermission }; 
+ } 

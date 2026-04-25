@@ -20,7 +20,7 @@ export default function ChatPage() {
   const [isSearching, setIsSearching] = useState(false);
   const [conversations, setConversations] = useState<any[]>([]); 
   
-  usePushNotifications(user?.uid);
+  const { permission, requestPermission } = usePushNotifications(user?.uid);
 
   useEffect(() => { 
     console.log("useEffect user:", user?.uid, user?.email); 
@@ -142,8 +142,34 @@ export default function ChatPage() {
               </button>
             </div>
           </div>
-
-          {/* Sidebar Content */}
+ 
+           {permission === "default" && ( 
+             <div 
+               onClick={requestPermission} 
+               style={{ 
+                 background: "#6B00B3", 
+                 padding: "10px 16px", 
+                 cursor: "pointer", 
+                 display: "flex", 
+                 alignItems: "center", 
+                 gap: 10, 
+                 borderBottom: "1px solid #4A0080" 
+               }} 
+             > 
+               <span style={{ fontSize: 20 }}>🔔</span> 
+               <div> 
+                 <p style={{ color: "white", fontSize: 13, fontWeight: 600, margin: 0 }}> 
+                   Ativar notificações 
+                 </p> 
+                 <p style={{ color: "rgba(255,255,255,0.7)", fontSize: 11, margin: 0 }}> 
+                   Toque para receber alertas de mensagens 
+                 </p> 
+               </div> 
+               <span style={{ color: "white", marginLeft: "auto", opacity: 0.7 }}>›</span> 
+             </div> 
+           )} 
+ 
+           {/* Sidebar Content */}
           <div className="flex-1 overflow-hidden relative">
             {isSearching ? (
               <UserSearch 
