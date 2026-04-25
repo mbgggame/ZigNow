@@ -12,10 +12,12 @@ import { db } from "@/lib/firebase";
 import { usePushNotifications } from "@/hooks/usePushNotifications"; 
 import SecurityAlert from "@/components/SecurityAlert"; 
 import { useSecurityMonitor } from "@/hooks/useSecurityMonitor"; 
+import { useSearchParams } from "next/navigation"; 
 
 export default function ChatPage() {
   const { userData, logout, user } = useAuthContext();
   const { threatDetected, dismissAlert } = useSecurityMonitor();
+  const searchParams = useSearchParams();
   const [activeConvId, setActiveConvId] = useState<string | null>(null);
   const [isSearching, setIsSearching] = useState(false);
   const [conversations, setConversations] = useState<any[]>([]); 
@@ -57,9 +59,29 @@ export default function ChatPage() {
     ); 
  
     return () => unsub(); 
-  }, [user]);
-
-  // Prevenir sleep no mobile (Wake Lock API)
+   }, [user]);
+ 
+   useEffect(() => { 
+     if (!("serviceWorker" in navigator)) return; 
+      
+     const handleMessage = (event: MessageEvent) => { 
+       if (event.data?.type === "OPEN_CONV" && event.data?.convId) { 
+         setActiveConvId(event.data.convId); 
+       } 
+     }; 
+      
+     navigator.serviceWorker.addEventListener("message", handleMessage); 
+     return () => navigator.serviceWorker.removeEventListener("message", handleMessage); 
+   }, []); 
+ 
+   useEffect(() => { 
+     const convId = searchParams.get("conv"); 
+     if (convId) { 
+       setActiveConvId(convId); 
+     } 
+   }, [searchParams]); 
+ 
+   // Prevenir sleep no mobile (Wake Lock API)
   useEffect(() => { 
     let wakeLock: any = null; 
      

@@ -24,7 +24,19 @@ importScripts('https://www.gstatic.com/firebasejs/10.0.0/firebase-app-compat.js'
   
  self.addEventListener('notificationclick', (event) => { 
    event.notification.close(); 
+   const convId = event.notification.data?.convId; 
+   const url = convId  
+     ? `https://zig-now-2bpo.vercel.app/chat?conv=${convId}` 
+     : 'https://zig-now-2bpo.vercel.app/chat'; 
    event.waitUntil( 
-     clients.openWindow('https://zig-now-2bpo.vercel.app/chat') 
+     clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => { 
+       for (const client of clientList) { 
+         if (client.url.includes('zig-now-2bpo.vercel.app') && 'focus' in client) { 
+           client.postMessage({ type: 'OPEN_CONV', convId }); 
+           return client.focus(); 
+         } 
+       } 
+       return clients.openWindow(url); 
+     }) 
    ); 
  }); 

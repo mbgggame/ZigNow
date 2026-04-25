@@ -107,7 +107,24 @@ const functions = require("firebase-functions");
        await admin.messaging().send({ 
          token: fcmToken, 
          notification, 
-         data: { convId, senderId } 
+         data: {  
+           convId,  
+           senderId, 
+           url: `/chat?conv=${convId}` 
+         }, 
+         apns: { 
+           payload: { 
+             aps: { 
+               sound: "default", 
+               badge: 1, 
+             } 
+           } 
+         }, 
+         webpush: { 
+           fcmOptions: { 
+             link: `https://zig-now-2bpo.vercel.app/chat?conv=${convId}` 
+           } 
+         } 
        }); 
        console.log("Notificação enviada para:", recipientId); 
      } catch (err) { 
