@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useAuthContext } from "@/hooks/useAuthContext";
 import { db } from "@/lib/firebase";
 import { doc, onSnapshot } from "firebase/firestore";
@@ -13,6 +13,23 @@ export function useCall(convId: string | null) {
   const [state, setState] = useState<CallState>("idle");
   const [callData, setCallData] = useState<any>(null);
   const [token, setToken] = useState<string | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  // Phone ringtone effect
+  useEffect(() => {
+    if (state === "calling" || state === "receiving") {
+      if (!audioRef.current) {
+        audioRef.current = new Audio("https://www.soundjay.com/phone/sounds/phone-calling-1.mp3");
+        audioRef.current.loop = true;
+      }
+      audioRef.current.play().catch(e => console.error("Audio play failed:", e));
+    } else if (state === "inCall" || state === "idle") {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+      }
+    }
+  }, [state]);
 
   // Listen for incoming calls
   useEffect(() => {
