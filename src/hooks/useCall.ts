@@ -6,6 +6,47 @@ import { db } from "@/lib/firebase";
 import { doc, onSnapshot } from "firebase/firestore";
 import { startCallRecord, updateCallStatus } from "@/lib/firestore";
 
+function createRingtone() { 
+  if (typeof window === "undefined") return null; 
+  const ctx = new AudioContext(); 
+  
+  const playRing = () => { 
+    const osc1 = ctx.createOscillator(); 
+    const osc2 = ctx.createOscillator(); 
+    const gain = ctx.createGain(); 
+    
+    osc1.connect(gain); 
+    osc2.connect(gain); 
+    gain.connect(ctx.destination); 
+    
+    osc1.frequency.value = 480; 
+    osc2.frequency.value = 620; 
+    osc1.type = "sine"; 
+    osc2.type = "sine"; 
+    
+    gain.gain.setValueAtTime(0.3, ctx.currentTime); 
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.5); 
+    
+    osc1.start(ctx.currentTime); 
+    osc2.start(ctx.currentTime); 
+    osc1.stop(ctx.currentTime + 1.5); 
+    osc2.stop(ctx.currentTime + 1.5); 
+  }; 
+
+  let interval: NodeJS.Timeout | null = null; 
+  
+  return { 
+    start: () => { 
+      playRing(); 
+      interval = setInterval(playRing, 3000); 
+    }, 
+    stop: () => { 
+      if (interval) clearInterval(interval); 
+      ctx.close(); 
+    } 
+  }; 
+} 
+
 export type CallState = "idle" | "calling" | "inCall" | "receiving";
 
 export function useCall(convId: string | null) {
@@ -13,20 +54,19 @@ export function useCall(convId: string | null) {
   const [state, setState] = useState<CallState>("idle");
   const [callData, setCallData] = useState<any>(null);
   const [token, setToken] = useState<string | null>(null);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const ringtoneRef = useRef<ReturnType<typeof createRingtone>>(null);
 
   // Phone ringtone effect
   useEffect(() => {
     if (state === "calling" || state === "receiving") {
-      if (!audioRef.current) {
-        audioRef.current = new Audio("https://www.soundjay.com/phone/sounds/phone-calling-1.mp3");
-        audioRef.current.loop = true;
+      if (!ringtoneRef.current) {
+        ringtoneRef.current = createRingtone();
+        ringtoneRef.current?.start();
       }
-      audioRef.current.play().catch(e => console.error("Audio play failed:", e));
-    } else if (state === "inCall" || state === "idle") {
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current.currentTime = 0;
+    } else if (state === "inCall" || state === "idle" || state === "rejected") {
+      if (ringtoneRef.current) {
+        ringtoneRef.current.stop();
+        ringtoneRef.current = null;
       }
     }
   }, [state]);
