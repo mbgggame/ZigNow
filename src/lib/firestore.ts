@@ -100,7 +100,10 @@ export async function sendMessage(convId: string, senderId: string, text: string
        createdAt: serverTimestamp(), 
        status: 'sent', 
        type: 'text', 
-       deletedAt: null 
+       deletedAt: null,
+       encryptedContent: null, 
+       iv: null, 
+       senderPublicKey: null 
      }); 
  
      const updateData: any = { 
