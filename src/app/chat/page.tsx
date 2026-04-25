@@ -10,9 +10,12 @@ import { LogOut, MessageSquarePlus, Search as SearchIcon, X } from "lucide-react
 import { collection, query, where, orderBy, onSnapshot, doc, getDoc } from "firebase/firestore"; 
 import { db } from "@/lib/firebase"; 
 import { usePushNotifications } from "@/hooks/usePushNotifications"; 
+import SecurityAlert from "@/components/SecurityAlert"; 
+import { useSecurityMonitor } from "@/hooks/useSecurityMonitor"; 
 
 export default function ChatPage() {
   const { userData, logout, user } = useAuthContext();
+  const { threatDetected, dismissAlert } = useSecurityMonitor();
   const [activeConvId, setActiveConvId] = useState<string | null>(null);
   const [isSearching, setIsSearching] = useState(false);
   const [conversations, setConversations] = useState<any[]>([]); 
@@ -151,6 +154,7 @@ export default function ChatPage() {
           )}
           <ChatArea convId={activeConvId} />
         </div>
+        {threatDetected && <SecurityAlert onDismiss={dismissAlert} />}
       </div>
     </AuthGuard>
   );

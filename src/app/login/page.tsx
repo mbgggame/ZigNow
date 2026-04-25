@@ -33,6 +33,8 @@ export default function LoginPage() {
       const result = await signInWithPopup(auth, googleProvider); 
       await handleRedirect(result.user.uid); 
     } catch (e: any) { 
+      const attempts = parseInt(localStorage.getItem("zighub_failed_auth") || "0") + 1; 
+      localStorage.setItem("zighub_failed_auth", String(attempts)); 
       setError(e.message); 
     } finally { 
       setLoading(false); 
@@ -51,6 +53,8 @@ export default function LoginPage() {
       } 
       await handleRedirect(result.user.uid); 
     } catch (e: any) { 
+      const attempts = parseInt(localStorage.getItem("zighub_failed_auth") || "0") + 1; 
+      localStorage.setItem("zighub_failed_auth", String(attempts)); 
       setError(e.message); 
     } finally { 
       setLoading(false); 
