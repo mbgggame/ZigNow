@@ -80,6 +80,16 @@ export default function ChatArea({ convId }: ChatAreaProps) {
     return () => unsubscribeMessages();
   }, [convId, user]);
 
+  useEffect(() => { 
+    const handleIncomingCall = (e: any) => { 
+      console.log("Chamada recebida via notificação:", e.detail.convId); 
+      // O useCall já vai detectar via onSnapshot do Firestore 
+    }; 
+     
+    window.addEventListener("incomingCall", handleIncomingCall); 
+    return () => window.removeEventListener("incomingCall", handleIncomingCall); 
+  }, []); 
+
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;

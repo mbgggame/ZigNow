@@ -76,8 +76,20 @@ export default function ChatPage() {
      if (typeof window === "undefined") return; 
      const params = new URLSearchParams(window.location.search); 
      const convId = params.get("conv"); 
+     const callParam = params.get("call"); 
+      
      if (convId) { 
        setActiveConvId(convId); 
+     } 
+      
+     if (callParam === "incoming" && convId) { 
+       // Pequeno delay para garantir que o componente montou 
+       setTimeout(() => { 
+         window.dispatchEvent(new CustomEvent("incomingCall", { detail: { convId } })); 
+       }, 1000); 
+     } 
+      
+     if (convId || callParam) { 
        // Limpa o parâmetro da URL sem recarregar 
        window.history.replaceState({}, "", "/chat"); 
      } 

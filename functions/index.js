@@ -74,6 +74,80 @@ const functions = require("firebase-functions");
   
      return null; 
    }); 
+
+ exports.notificarChamada = functions 
+   .region("us-east1") 
+   .firestore.document("calls/{convId}") 
+   .onWrite(async (change, context) => { 
+     const depois = change.after.exists ? change.after.data() : null; 
+     const antes = change.before.exists ? change.before.data() : null; 
+  
+     // Só notifica quando status muda para 'calling' 
+     if (!depois || depois.status !== 'calling') return null; 
+     if (antes && antes.status === 'calling') return null; 
+  
+     const convId = context.params.convId; 
+     const callerId = depois.callerId; 
+     const callerName = depois.callerName || "Alguém"; 
+  
+     // Busca participantes da conversa 
+     const convDoc = await admin.firestore() 
+       .doc(`conversations/${convId}`).get(); 
+     if (!convDoc.exists) return null; 
+  
+     const participants = convDoc.data()?.participants || []; 
+     const recipientId = participants.find((uid) => uid !== callerId); 
+     if (!recipientId) return null; 
+  
+     // Busca FCM token do destinatário 
+     const recipientDoc = await admin.firestore() 
+       .doc(`users/${recipientId}`).get(); 
+     const fcmToken = recipientDoc.data()?.fcmToken; 
+     if (!fcmToken) return null; 
+  
+     try { 
+       await admin.messaging().send({ 
+         token: fcmToken, 
+         notification: { 
+           title: `📞 ${callerName} está ligando`, 
+           body: "Toque para atender a chamada" 
+         }, 
+         data: { 
+           type: "call", 
+           convId, 
+           callerId, 
+           callerName, 
+           url: `/chat?conv=${convId}&call=incoming` 
+         }, 
+         apns: { 
+           payload: { 
+             aps: { 
+               sound: "default", 
+               badge: 1, 
+               "content-available": 1 
+             } 
+           }, 
+           headers: { 
+             "apns-priority": "10", 
+             "apns-push-type": "alert" 
+           } 
+         }, 
+         webpush: { 
+           headers: { 
+             Urgency: "high" 
+           }, 
+           fcmOptions: { 
+             link: `https://zig-now-2bpo.vercel.app/chat?conv=${convId}&call=incoming` 
+           } 
+         } 
+       }); 
+       console.log("Notificação de chamada enviada para:", recipientId); 
+     } catch (err) { 
+       console.error("Erro ao notificar chamada:", err); 
+     } 
+  
+     return null; 
+   }); 
   
  exports.notificarNovaMensagem = functions 
    .region("us-east1") 
