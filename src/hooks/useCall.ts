@@ -140,6 +140,15 @@ export function useCall(convId: string | null) {
 
   const startCall = async () => {
     if (!convId || !user || !userData) return;
+
+    // Pré-solicita permissão de microfone para persistir 
+    try { 
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true }); 
+      stream.getTracks().forEach(track => track.stop()); // libera imediatamente 
+    } catch (err) { 
+      console.log("Permissão de microfone negada:", err); 
+    }
+
     setState("calling");
     await startCallRecord(convId, user.uid, userData.displayName || userData.username);
     await fetchToken(convId);
@@ -147,6 +156,15 @@ export function useCall(convId: string | null) {
 
   const acceptCall = async () => {
     if (!convId) return;
+
+    // Pré-solicita permissão de microfone para persistir 
+    try { 
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true }); 
+      stream.getTracks().forEach(track => track.stop()); // libera imediatamente 
+    } catch (err) { 
+      console.log("Permissão de microfone negada:", err); 
+    }
+
     await updateCallStatus(convId, "active");
     await fetchToken(convId);
     setState("inCall");

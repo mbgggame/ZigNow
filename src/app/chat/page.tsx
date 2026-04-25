@@ -136,6 +136,13 @@ export default function ChatPage() {
     return () => document.removeEventListener("visibilitychange", handleVisibility); 
   }, []); 
 
+  useEffect(() => { 
+    if (!user) return; 
+    navigator.mediaDevices.getUserMedia({ audio: true }) 
+      .then(stream => stream.getTracks().forEach(t => t.stop())) 
+      .catch(() => {}); // silencioso se negar 
+  }, [user]); 
+
   return (
     <AuthGuard>
       <div className="flex h-screen w-screen bg-[#F0E6FF] overflow-hidden font-sans text-gray-900">
