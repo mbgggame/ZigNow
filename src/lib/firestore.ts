@@ -35,6 +35,8 @@ export async function createUserProfile(uid: string, data: { username: string; d
       photoURL: data.photoURL,
       createdAt: serverTimestamp(),
       blocked: [],
+      walletAddress: null,
+      walletVerifiedAt: null,
     });
 
     transaction.set(usernameRef, {
